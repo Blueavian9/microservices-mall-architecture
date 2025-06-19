@@ -1,5 +1,180 @@
 <!DOCTYPE html>
 <html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Microservices Mall Architecture</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>🏢 Mall Architecture & Blueprint Design</h1>
+
+    <!-- MALL SECTION -->
+    <div class="section mall-section">
+      <div class="section-title">🏬 Shopping Mall System Architecture
+      </div>
+      <div class="mall-container">
+        <!-- FLOOR 4: MANAGEMENT & MONITORING -->
+        <div class="floor floor-4">
+          <div class="floor-title">
+            <span>🏢</span> FLOOR 4: Management & Monitoring Layer
+          </div>
+          <div class="departments">
+            <div class="department">Admin Dashboard</div>
+            <div class="department">System Monitoring</div>
+            <div class="department">Analytics Center</div>
+            <div class="department">Security Control</div>
+            <div class="department">Performance Metrics</div>
+            <div class="department">Error Tracking</div>
+          </div>
+        </div>
+
+        <!-- FLOOR 3: BUSINESS SERVICES -->
+        <div class="floor floor-3">
+          <div class="floor-title">
+            <span>🏪</span> FLOOR 3: Business Services Layer
+          </div>
+          <div class="departments">
+            <div class="department">User Service Store</div>
+            <div class="department">Product Service Shop</div>
+            <div class="department">Order Service Center</div>
+            <div class="department">Payment Service Bank</div>
+            <div class="department">Notification Service</div>
+            <div class="department">Email Service Post</div>
+          </div>
+        </div>
+
+        <!-- FLOOR 2: API & GATEWAY -->
+        <div class="floor floor-2">
+          <div class="floor-title">
+            <span>🚪</span> FLOOR 2: API Gateway & Security Layer
+          </div>
+          <div class="departments">
+            <div class="department">Main Entrance (API Gateway)</div>
+            <div class="department">Security Checkpoint</div>
+            <div class="department">Traffic Controller</div>
+            <div class="department">Rate Limiting Booth</div>
+            <div class="department">Authentication Desk</div>
+            <div class="department">Load Balancer Hub</div>
+          </div>
+        </div>
+
+        <!-- FLOOR 1: CLIENT INTERFACES -->
+        <div class="floor floor-1">
+          <div class="floor-title">
+            <span>👥</span> FLOOR 1: Customer Interface Layer
+          </div>
+          <div class="departments">
+            <div class="department">Web App Storefront</div>
+            <div class="department">Mobile App Kiosk</div>
+            <div class="department">Admin Panel Office</div>
+            <div class="department">Customer Service</div>
+            <div class="department">Self-Service Terminal</div>
+            <div class="department">Information Desk</div>
+          </div>
+        </div>
+
+        <!-- INFRASTRUCTURE -->
+        <div class="infrastructure">
+          <strong>🔧 Infrastructure Basement:</strong><br>
+          • Database Warehouse<br>
+          • Cache Storage<br>
+          • Message Queue System<br>
+          • Search Engine<br>
+          • Backup Systems
+        </div>
+      </div>
+    </div>
+
+    <!-- BLUEPRINT SECTION -->
+    <div class="section blueprint-section">
+      <div class="section-title">📋 Architectural Blueprint Brainstorm</div>
+      <div class="blueprint-container">
+        <div class="blueprint-grid">
+          <div class="blueprint-component client-layer">Web Client</div>
+          <div class="blueprint-component gateway">API Gateway</div>
+          <div class="blueprint-component load-balancer">Load Balancer</div>
+
+          <div class="blueprint-component user-service">User Service</div>
+          <div class="blueprint-component product-service">Product Service</div>
+          <div class="blueprint-component order-service">Order Service</div>
+          <div class="blueprint-component payment-service">Payment Service</div>
+
+          <div class="blueprint-component message-queue">Message Queue</div>
+          <div class="blueprint-component cache">Redis Cache</div>
+          <div class="blueprint-component search">Search Engine</div>
+
+          <div class="blueprint-component database-1">User Database</div>
+          <div class="blueprint-component database-2">Product Database</div>
+          <div class="blueprint-component monitoring">Monitoring</div>
+          <div class="blueprint-component logging">Logging</div>
+
+          <div class="connection-line line-1"></div>
+          <div class="connection-line line-2"></div>
+          <div class="connection-line line-3"></div>
+          <div class="connection-line line-4"></div>
+          <div class="connection-line line-5"></div>
+        </div>
+        <div class="legend">
+          <div class="legend-item">
+            <div class="legend-color" style="background: #27ae60;"></div>
+            <span>Client Layer</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #f39c12;"></div>
+            <span>Gateway Layer</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #e74c3c;"></div>
+            <span>Business Services</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #95a5a6;"></div>
+            <span>Infrastructure</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #16a085;"></div>
+            <span>Data Layer</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="brainstorm-titles">
+        <div class="brainstorm-card">
+          <div class="brainstorm-title">🎯 Scalability Planning</div>
+          <div class="brainstorm-description">Handle scale with horizontal scaling, sharding, caching.</div>
+        </div>
+        <div class="brainstorm-card">
+          <div class="brainstorm-title">🔒 Security Architecture</div>
+          <div class="brainstorm-description">Data encryption, API auth, validation, secure flows.</div>
+        </div>
+        <div class="brainstorm-card">
+          <div class="brainstorm-title">⚡ Performance Optimization</div>
+          <div class="brainstorm-description">CDN, lazy loading, DB tuning, fast response targets.</div>
+        </div>
+        <div class="brainstorm-card">
+          <div class="brainstorm-title">🔄 Data Flow Mapping</div>
+          <div class="brainstorm-description">Service interactions, message queues, event-based design.</div>
+        </div>
+        <div class="brainstorm-card">
+          <div class="brainstorm-title">🛠️ DevOps Integration</div>
+          <div class="brainstorm-description">CI/CD, containers, observability, test automation.</div>
+        </div>
+        <div class="brainstorm-card">
+          <div class="brainstorm-title">🚨 Error Handling & Recovery</div>
+          <div class="brainstorm-description">Circuit breakers, retries, backups, degradation plans.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+
+
+<!-- 
+<!DOCTYPE html>
+<html lang="en">
 
 <head>
   <meta charset="UTF-8" />
@@ -18,7 +193,7 @@
 </html>
 
 
-<!--  Mock 1:  
+ Mock 1:  
 <!DOCTYPE html>
 <html lang="en">
 <head>
