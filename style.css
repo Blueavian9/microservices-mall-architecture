@@ -1,28 +1,157 @@
-/* 
+/* Base Styles */
 body {
-    font-family: Arial, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     margin: 0;
     padding: 20px;
-    background: linear-gradient(to right, #4facfe, #00f2fe);
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    min-height: 100vh;
+    color: #333;
 }
 
 .container {
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
-    background: #fff;
+    background: white;
+    border-radius: 20px;
     padding: 30px;
-    border-radius: 15px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
 }
 
 h1 {
     text-align: center;
-    background: linear-gradient(to right, #00c6ff, #0072ff);
+    color: #2c3e50;
+    margin-bottom: 40px;
+    font-size: 2.5em;
+    background: linear-gradient(45deg, #1e3c72, #2a5298);
     background-clip: text;
     -webkit-background-clip: text;
+    color: transparent;
     -webkit-text-fill-color: transparent;
-    font-size: 2.5em;
-    margin-bottom: 30px;
 }
 
-Add additional styles here */
+/* Section Styling */
+.section {
+    margin-bottom: 50px;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.mall-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.section-title {
+    font-size: 2.2em;
+    margin-bottom: 30px;
+    text-align: center;
+    font-weight: bold;
+}
+
+/* Mall Container & Floors */
+.mall-container {
+    background: #f8f9fa;
+    border-radius: 15px;
+    padding: 30px;
+    position: relative;
+    min-height: 600px;
+    border: 3px solid #e9ecef;
+}
+
+.floor {
+    margin-bottom: 25px;
+    padding: 20px;
+    border-radius: 12px;
+    border-left: 5px solid;
+    position: relative;
+}
+
+/* Floors Color Themes */
+.floor-1 {
+    background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+    border-left-color: #e74c3c;
+}
+
+.floor-2 {
+    background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+    border-left-color: #3498db;
+}
+
+.floor-3 {
+    background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+    color: white;
+    border-left-color: #f39c12;
+}
+
+.floor-4 {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-left-color: #9b59b6;
+}
+
+.floor-title {
+    font-size: 1.5em;
+    font-weight: bold;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Departments Layout */
+.departments {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.department {
+    background: rgba(255, 255, 255, 0.9);
+    color: #2c3e50;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+    font-weight: bold;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.department:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+/* Floors 3 & 4 override department style */
+.floor-3 .department,
+.floor-4 .department {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+}
+
+/* Infrastructure Section */
+.infrastructure {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(52, 73, 94, 0.9);
+    color: white;
+    padding: 15px;
+    border-radius: 10px;
+    font-size: 0.9em;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .departments {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    }
+
+    .infrastructure {
+        position: static;
+        margin-top: 20px;
+    }
+}
+
