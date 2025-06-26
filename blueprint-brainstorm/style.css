@@ -1,0 +1,196 @@
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    min-height: 100vh;
+    color: #333;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.section {
+    margin-bottom: 50px;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.blueprint-section {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+}
+
+.section-title {
+    font-size: 2.2em;
+    margin-bottom: 30px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.blueprint-container {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    padding: 30px;
+    margin-bottom: 30px;
+}
+
+.blueprint-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    position: relative;
+    min-height: 400px;
+}
+
+.blueprint-component {
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    font-weight: bold;
+    color: white;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    z-index: 2;
+}
+
+.blueprint-component:hover {
+    transform: scale(1.05);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
+}
+
+.client-layer { background: #27ae60; }
+.gateway { background: #f39c12; }
+.load-balancer { background: #f39c12; }
+.user-service { background: #e74c3c; }
+.product-service { background: #e74c3c; }
+.order-service { background: #e74c3c; }
+.payment-service { background: #e74c3c; }
+.message-queue { background: #95a5a6; }
+.cache { background: #95a5a6; }
+.search { background: #95a5a6; }
+.database-1 { background: #16a085; }
+.database-2 { background: #16a085; }
+.monitoring { background: #95a5a6; }
+.logging { background: #95a5a6; }
+
+.connection-line {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.6);
+    z-index: 1;
+}
+
+.line-1 {
+    top: 50px;
+    left: 25%;
+    width: 50%;
+    height: 3px;
+}
+
+.line-2 {
+    top: 150px;
+    left: 25%;
+    width: 50%;
+    height: 3px;
+}
+
+.line-3 {
+    top: 250px;
+    left: 25%;
+    width: 50%;
+    height: 3px;
+}
+
+.line-4 {
+    top: 350px;
+    left: 25%;
+    width: 50%;
+    height: 3px;
+}
+
+.line-5 {
+    top: 200px;
+    left: 75%;
+    width: 3px;
+    height: 200px;
+}
+
+.legend {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 30px;
+    flex-wrap: wrap;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 10px 15px;
+    border-radius: 8px;
+}
+
+.legend-color {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+}
+
+.brainstorm-titles {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 30px;
+}
+
+.brainstorm-card {
+    background: rgba(255, 255, 255, 0.15);
+    padding: 20px;
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+}
+
+.brainstorm-card:hover {
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.25);
+}
+
+.brainstorm-title {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: white;
+}
+
+.brainstorm-description {
+    font-size: 0.9em;
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.4;
+}
+
+@media (max-width: 768px) {
+    .blueprint-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+    .legend {
+        flex-direction: column;
+        align-items: center;
+    }
+    .brainstorm-titles {
+        grid-template-columns: 1fr;
+    }
+} 

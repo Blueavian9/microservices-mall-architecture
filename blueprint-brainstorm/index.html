@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Architectural Blueprint Brainstorm</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <div class="section blueprint-section">
+      <div class="section-title">📋 Architectural Blueprint Brainstorm</div>
+      <div class="blueprint-container">
+        <div class="blueprint-grid">
+          <div class="blueprint-component client-layer">Web Client</div>
+          <div class="blueprint-component gateway">API Gateway</div>
+          <div class="blueprint-component load-balancer">Load Balancer</div>
+          <div class="blueprint-component user-service">User Service</div>
+          <div class="blueprint-component product-service">Product Service</div>
+          <div class="blueprint-component order-service">Order Service</div>
+          <div class="blueprint-component payment-service">Payment Service</div>
+          <div class="blueprint-component message-queue">Message Queue</div>
+          <div class="blueprint-component cache">Redis Cache</div>
+          <div class="blueprint-component search">Search Engine</div>
+          <div class="blueprint-component database-1">User Database</div>
+          <div class="blueprint-component database-2">Product Database</div>
+          <div class="blueprint-component monitoring">Monitoring</div>
+          <div class="blueprint-component logging">Logging</div>
+          <div class="connection-line line-1"></div>
+          <div class="connection-line line-2"></div>
+          <div class="connection-line line-3"></div>
+          <div class="connection-line line-4"></div>
+          <div class="connection-line line-5"></div>
+        </div>
+        <div class="legend">
+          <div class="legend-item">
+            <div class="legend-color" style="background: #27ae60;"></div>
+            <span>Client Layer</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #f39c12;"></div>
+            <span>Gateway Layer</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #e74c3c;"></div>
+            <span>Business Services</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #95a5a6;"></div>
+            <span>Infrastructure</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #16a085;"></div>
+            <span>Data Layer</span>
+          </div>
+        </div>
+      </div>
+      <div class="brainstorm-titles">
+        <div class="brainstorm-card">
+          <div class="brainstorm-title">🎯 Scalability Planning</div>
+          <div class="brainstorm-description">Handle scale with horizontal scaling, sharding, caching.</div>
+        </div>
+        <div class="brainstorm-card">
+          <div class="brainstorm-title">🔒 Security Architecture</div>
+          <div class="brainstorm-description">Data encryption, API auth, validation, secure flows.</div>
+        </div>
+        <div class="brainstorm-card">
+          <div class="brainstorm-title">⚡ Performance Optimization</div>
+          <div class="brainstorm-description">CDN, lazy loading, DB tuning, fast response targets.</div>
+        </div>
+        <div class="brainstorm-card">
+          <div class="brainstorm-title">🔄 Data Flow Mapping</div>
+          <div class="brainstorm-description">Service interactions, message queues, event-based design.</div>
+        </div>
+        <div class="brainstorm-card">
+          <div class="brainstorm-title">🛠️ DevOps Integration</div>
+          <div class="brainstorm-description">CI/CD, containers, observability, test automation.</div>
+        </div>
+        <div class="brainstorm-card">
+          <div class="brainstorm-title">🚨 Error Handling & Recovery</div>
+          <div class="brainstorm-description">Circuit breakers, retries, backups, degradation plans.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html> 
