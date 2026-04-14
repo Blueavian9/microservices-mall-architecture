@@ -30,6 +30,17 @@
 
 ---
 
+## Delivery discipline (commits & PRD)
+
+Work is checkpointed at every meaningful boundary:
+
+1. **After** completing any **Main Step**, **Phase**, **EPIC**, or **Agent Task**: **commit** with a clear, scoped message and **push** to `main` (or the active integration branch).
+2. **Immediately after** that push: **update this `PRD.md`** — phase/task status, tables, and notes — so the document stays aligned with the repo and remains the single source of truth for progress.
+
+Skipping either step should be the exception (e.g., blocked network), not the default.
+
+---
+
 ## Architecture Overview
 
 ```
