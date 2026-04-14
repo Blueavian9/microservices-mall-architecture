@@ -41,6 +41,24 @@ Skipping either step should be the exception (e.g., blocked network), not the de
 
 ---
 
+## Agent tasks (A1–A9)
+
+| Task | Maps to | Focus |
+|------|---------|--------|
+| **A1** | PHASE 1 | Local K8s: toolchain (kubectl, minikube, Helm, k9s) + Minikube running + ingress + metrics-server |
+| **A2** | PHASE 2 | Microservices — build and containerize each service |
+| **A3** | PHASE 3 | Kubernetes manifests (Deployments, Services, Ingress) |
+| **A4** | PHASE 4 | NATS event bus (Helm) + shared schema / contracts |
+| **A5** | PHASE 5 | Prometheus + service `/metrics` + metrics-service wiring |
+| **A6** | PHASE 6 | React live dashboard (topology, events, WebSocket) |
+| **A7** | PHASE 7 | HPA demo + load test |
+| **A8** | PHASE 8 | Cloud deploy (e.g. EKS) |
+| **A9** | PHASE 9 | README polish + demo assets + GIFs |
+
+Execute in order **A1 → A2 → … → A9**. After each task: commit, push, update this PRD.
+
+---
+
 ## Architecture Overview
 
 ```
@@ -101,9 +119,10 @@ D — Services depend on NATS abstractions — swap broker without touching busi
 
 ### Task 1: Install Toolchain
 
-**Status:** ❌ Not started
+**Status:** 🔄 In progress — CLIs installed (Scoop: kubectl, minikube, helm, k9s); **Minikube cluster not running** until Docker Desktop is installed and on `PATH`, then `minikube start --driver=docker ...` + addons.
 
-- Install Minikube, kubectl, Helm, k9s (optional); start Minikube with resources; enable ingress and metrics-server addons.
+- Install Minikube, kubectl, Helm, k9s — **done on dev machine via Scoop** (see `scripts/install-toolchain.ps1`). Verify with `scripts/verify-toolchain.ps1`.
+- Start Minikube with `--cpus=4 --memory=8192 --disk-size=20g`; enable **ingress** and **metrics-server** addons — **pending Docker**.
 - Commit: `chore: toolchain setup + Minikube running`
 
 ### Task 2: Monorepo Scaffold
@@ -176,7 +195,7 @@ Mermaid/Excalidraw diagram; three GIFs; full README sections and live demo URL.
 
 | Phase | Status | Key Deliverable |
 |-------|--------|-----------------|
-| 1 — K8s Local | 🔄 | Monorepo scaffold ✅; Minikube + toolchain (Task 1) pending |
+| 1 — K8s Local | 🔄 | Monorepo scaffold ✅; toolchain CLIs ✅ (Scoop); Minikube cluster + addons ⏳ (needs Docker) |
 | 2 — Services | ❌ | 5 Dockerized microservices |
 | 3 — K8s Manifests | ❌ | Deployments + Ingress |
 | 4 — NATS | ❌ | Event-driven architecture |
