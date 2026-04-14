@@ -1,0 +1,45 @@
+# Local smoke stack: gateway + NATS + two minimal HTTP stubs (echo bodies).
+services:
+  nats:
+    image: nats:2.10-alpine
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+    command: ["-m", "8222"]
+
+  auth-stub:
+    image: node:20-alpine
+    command:
+      [
+        "node",
+        "-e",
+        "require('http').createServer((q,s)=>{s.writeHead(200);s.end('auth-stub');}).listen(3001,'0.0.0.0');",
+      ]
+    expose:
+      - "3001"
+
+  booking-stub:
+    image: node:20-alpine
+    command:
+      [
+        "node",
+        "-e",
+        "require('http').createServer((q,s)=>{s.writeHead(200);s.end('booking-stub');}).listen(3002,'0.0.0.0');",
+      ]
+    expose:
+      - "3002"
+
+  gateway:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: "3000"
+      NATS_URL: "nats://nats:4222"
+      AUTH_SERVICE_URL: "http://auth-stub:3001"
+      BOOKING_SERVICE_URL: "http://booking-stub:3002"
+      ALLOWED_ORIGINS: "http://localhost:5173"
+    depends_on:
+      - nats
+      - auth-stub
+      - booking-stub

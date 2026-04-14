@@ -18,9 +18,20 @@ const httpRequestDurationMs = new promClient.Histogram({
   registers: [register],
 });
 
+/**
+ * Low-cardinality route label: Express routes use req.route.path; proxied paths
+ * collapse to /auth/* and /booking/* so IDs do not explode metric series.
+ */
 function routeLabel(req) {
-  if (req.route && req.route.path) return req.route.path;
-  return req.path || 'unknown';
+  if (req.route && req.route.path) {
+    return req.route.path;
+  }
+  const p = req.path || req.url?.split('?')[0] || '';
+  if (p.startsWith('/auth')) return '/auth/*';
+  if (p.startsWith('/booking')) return '/booking/*';
+  if (p === '/health') return '/health';
+  if (p === '/metrics') return '/metrics';
+  return 'other';
 }
 
 function metricsMiddleware(req, res, next) {

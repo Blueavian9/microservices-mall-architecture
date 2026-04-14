@@ -3,11 +3,15 @@ const { v4: uuidv4 } = require('uuid');
 
 let nc = null;
 
+/**
+ * Exponential backoff after each failed connect: 1s, 2s, 4s, 8s, 16s.
+ * Exactly `BACKOFF_MS.length` waits and `BACKOFF_MS.length + 1` attempts (initial try + retries).
+ * Loop bound is `< maxAttempts`, never `<= BACKOFF_MS.length` (avoids an extra stray attempt).
+ */
 const BACKOFF_MS = [1000, 2000, 4000, 8000, 16000];
 
 /**
- * Connect to NATS with exponential backoff (5 retries after initial attempt).
- * Does not throw — logs warnings if NATS stays unavailable.
+ * Connect to NATS with exponential backoff. Does not throw — logs and continues.
  */
 async function connectNATS() {
   const url = process.env.NATS_URL;
@@ -16,15 +20,19 @@ async function connectNATS() {
     return;
   }
 
+  const maxAttempts = BACKOFF_MS.length + 1;
   let lastErr;
-  for (let attempt = 0; attempt <= BACKOFF_MS.length; attempt += 1) {
+  for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
     try {
       nc = await connect({ servers: url });
       console.info('NATS connected');
       return;
     } catch (err) {
       lastErr = err;
-      console.warn(`NATS connect attempt ${attempt + 1} failed:`, err.message);
+      console.warn(
+        `NATS connect attempt ${attempt + 1}/${maxAttempts} failed:`,
+        err.message,
+      );
       if (attempt < BACKOFF_MS.length) {
         await new Promise((resolve) => setTimeout(resolve, BACKOFF_MS[attempt]));
       }
@@ -33,9 +41,6 @@ async function connectNATS() {
   console.warn('NATS unavailable after retries; continuing without NATS:', lastErr?.message);
 }
 
-/**
- * Publish event with contract shape. No-op if NATS is down (service keeps running).
- */
 function publishEvent(subject, data) {
   if (!nc) {
     console.warn('publishEvent skipped (no NATS):', subject);

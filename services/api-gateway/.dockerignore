@@ -1,0 +1,11 @@
+node_modules
+npm-debug.log
+coverage
+.git
+.gitignore
+*.test.js
+jest.config.js
+docker-compose.yml
+test-local.sh
+.env
+.env.*

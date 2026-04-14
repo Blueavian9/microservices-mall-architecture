@@ -1,51 +1,13 @@
 const http = require('http');
-const express = require('express');
-const cors = require('cors');
-const helmet = require('helmet');
-const morgan = require('morgan');
-const { connectNATS, drainNATS } = require('./events');
-const { createRoutes } = require('./routes');
-const { metricsMiddleware, register } = require('./middleware/metrics');
-
-const app = express();
-
-function allowedOrigins() {
-  const raw = process.env.ALLOWED_ORIGINS;
-  if (!raw) return false;
-  const list = raw.split(',').map((s) => s.trim()).filter(Boolean);
-  return list.length ? list : false;
-}
+const { validate } = require('./env.validate');
+const { connectNATS, drainNATS } = require('./middleware/nats.client');
+const { createApp } = require('./app');
 
 async function main() {
+  validate();
   await connectNATS();
 
-  app.use(helmet());
-
-  app.use(
-    cors({
-      origin: allowedOrigins(),
-    }),
-  );
-
-  app.use(morgan('combined'));
-  app.use(metricsMiddleware);
-
-  app.get('/health', (req, res) => {
-    res.json({
-      status: 'ok',
-      service: 'api-gateway',
-      timestamp: new Date().toISOString(),
-      uptime: process.uptime(),
-    });
-  });
-
-  app.get('/metrics', async (req, res) => {
-    res.set('Content-Type', register.contentType);
-    res.end(await register.metrics());
-  });
-
-  createRoutes(app);
-
+  const app = createApp();
   const port = Number(process.env.PORT) || 3000;
   const server = http.createServer(app);
 
