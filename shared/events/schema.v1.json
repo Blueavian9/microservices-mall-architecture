@@ -1,0 +1,31 @@
+{
+  "version": "1.0.0",
+  "subjects": {
+    "user.registered": {
+      "description": "Emitted by auth-service when a new user registers",
+      "fields": {
+        "userId": "string (uuid)",
+        "email": "string",
+        "timestamp": "ISO8601"
+      }
+    },
+    "booking.created": {
+      "description": "Emitted by booking-service when a booking is confirmed",
+      "fields": {
+        "bookingId": "string (uuid)",
+        "userId": "string (uuid)",
+        "service": "string",
+        "timestamp": "ISO8601"
+      }
+    },
+    "request.received": {
+      "description": "Emitted by api-gateway on every inbound request",
+      "fields": {
+        "requestId": "string (uuid)",
+        "route": "string",
+        "method": "string",
+        "timestamp": "ISO8601"
+      }
+    }
+  }
+}
