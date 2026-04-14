@@ -125,6 +125,18 @@ D — Services depend on NATS abstractions — swap broker without touching busi
 - Start Minikube with `--cpus=4 --memory=8192 --disk-size=20g`; enable **ingress** and **metrics-server** addons — **pending Docker**.
 - Commit: `chore: toolchain setup + Minikube running`
 
+**A1 completion checklist (run on your machine):**
+
+1. **Docker Desktop** — Install for Windows, finish first-run setup, confirm `docker version` works in PowerShell (Docker must be on `PATH`).
+2. **Cluster + addons** — From repo root: `.\scripts\install-toolchain.ps1` (installs CLIs if needed, then starts Minikube and enables addons when `docker` exists). *Or* run only the Minikube lines if CLIs are already installed:
+   - `minikube start --driver=docker --cpus=4 --memory=8192 --disk-size=20g`
+   - `minikube addons enable ingress`
+   - `minikube addons enable metrics-server`
+3. **Verify** — `.\scripts\verify-toolchain.ps1`; `kubectl get nodes`; `minikube status`; `minikube addons list` (ingress and metrics-server enabled).
+4. **Gate** — When the above passes, mark **A1** ✅ and **PHASE 1** complete in this file, commit + push, then begin **A2** (microservices).
+
+Until A1 is finished locally, `git status` may stay clean — there is nothing to commit until you update the PRD after Minikube is up or add automation/docs from that work.
+
 ### Task 2: Monorepo Scaffold
 
 **Status:** ✅ Complete
