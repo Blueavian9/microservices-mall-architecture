@@ -1,0 +1,13 @@
+{
+  "name": "booking-service",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "scripts": { "start": "node src/index.js" },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "nats": "^2.28.2",
+    "pg": "^8.11.5",
+    "prom-client": "^15.1.3"
+  }
+}
