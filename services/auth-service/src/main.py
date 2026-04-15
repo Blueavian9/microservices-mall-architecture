@@ -1,120 +1,54 @@
-"""auth-service — FastAPI (PRD Phase 2)."""
+from fastapi import FastAPI, Depends, HTTPException, status
+from sqlalchemy.orm import Session
+from passlib.context import CryptContext
+from jose import jwt
+from pydantic import BaseModel, EmailStr
+import datetime, asyncio
+from prometheus_fastapi_instrumentator import Instrumentator
 
-from __future__ import annotations
+from .db import init_db, get_db, User
+from .config import settings
+from .nats_client import publish
 
-import logging
-import time
-from contextlib import asynccontextmanager
-from datetime import UTC, datetime
+app = FastAPI(title="auth-service")
+Instrumentator().instrument(app).expose(app)
 
-from dotenv import load_dotenv
-from fastapi import FastAPI, Request
-from fastapi.middleware.cors import CORSMiddleware
-from prometheus_client import CONTENT_TYPE_LATEST, Counter, generate_latest, REGISTRY
-from starlette.responses import Response
+pwd_ctx = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-from src import db
-from src.events import connect_nats, drain_nats
-from src.routers import auth as auth_router
-from src.settings import get_settings
+class RegisterRequest(BaseModel):
+    email: EmailStr
+    password: str
 
-load_dotenv()
+class LoginRequest(BaseModel):
+    email: EmailStr
+    password: str
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-_started = time.monotonic()
-
-_http_requests = Counter(
-    "http_requests_total",
-    "HTTP requests",
-    ["method", "status"],
-    registry=REGISTRY,
-)
-
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    s = get_settings()
-    if not s.skip_db:
-        await db.init_pool()
-        assert db.pool is not None
-        async with db.pool.acquire() as conn:
-            await conn.execute("SELECT 1")
-        logger.info("Database ping OK")
-        await db.migrate()
-        await connect_nats()
-    else:
-        logger.warning("SKIP_DB=1 — database and NATS disabled (tests/dev only)")
-    yield
-    if not s.skip_db:
-        await drain_nats()
-        await db.close_pool()
-
-
-app = FastAPI(title="auth-service", lifespan=lifespan)
-
-
-@app.middleware("http")
-async def add_security_headers(request: Request, call_next):
-    response = await call_next(request)
-    response.headers["X-Content-Type-Options"] = "nosniff"
-    response.headers["X-Frame-Options"] = "DENY"
-    response.headers["Referrer-Policy"] = "no-referrer"
-    return response
-
-
-@app.middleware("http")
-async def count_http_requests(request: Request, call_next):
-    method = request.method
-    response = await call_next(request)
-    status = str(response.status_code)
-    try:
-        _http_requests.labels(method=method, status=status).inc()
-    except Exception:
-        pass
-    return response
-
-
-def _setup_cors(application: FastAPI) -> None:
-    s = get_settings()
-    origins = s.cors_origins
-    application.add_middleware(
-        CORSMiddleware,
-        allow_origins=origins if origins else ["*"],
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
-
-
-_setup_cors(app)
-
+@app.on_event("startup")
+async def startup():
+    init_db()
 
 @app.get("/health")
-async def root_health():
-    return {
-        "status": "ok",
-        "service": "auth-service",
-        "timestamp": datetime.now(UTC).isoformat().replace("+00:00", "Z"),
-        "uptime": time.monotonic() - _started,
-    }
+def health():
+    return {"status": "ok", "service": "auth-service"}
 
+@app.post("/register", status_code=201)
+async def register(req: RegisterRequest, db: Session = Depends(get_db)):
+    if db.query(User).filter(User.email == req.email).first():
+        raise HTTPException(status_code=400, detail="Email already registered")
+    user = User(email=req.email, hashed_password=pwd_ctx.hash(req.password))
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    await publish("auth.user_registered", {"userId": str(user.id), "email": user.email})
+    return {"id": str(user.id), "email": user.email}
 
-def metrics_payload() -> Response:
-    data = generate_latest(REGISTRY)
-    return Response(content=data, media_type=CONTENT_TYPE_LATEST)
-
-
-@app.get("/metrics")
-async def metrics_root():
-    return metrics_payload()
-
-
-app.include_router(auth_router.router, prefix="/auth")
-app.include_router(auth_router.router, prefix="/api/auth")
-
-
-@app.get("/auth/metrics", include_in_schema=False)
-async def metrics_auth_alias():
-    return metrics_payload()
+@app.post("/login")
+def login(req: LoginRequest, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.email == req.email).first()
+    if not user or not pwd_ctx.verify(req.password, user.hashed_password):
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+    token = jwt.encode(
+        {"sub": str(user.id), "exp": datetime.datetime.utcnow() + datetime.timedelta(minutes=settings.jwt_expire_minutes)},
+        settings.jwt_secret, algorithm=settings.jwt_algorithm
+    )
+    return {"access_token": token, "token_type": "bearer"}
