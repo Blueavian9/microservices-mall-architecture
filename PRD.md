@@ -161,10 +161,14 @@ Each service is a separate Docker image. Each owns its domain. Each emits events
 - Stack: Python / FastAPI
 - Needs: NATS subscriber for `booking.created` + `auth.user_registered`; `GET /health` only
 
-### metrics-service ❌
-- Directory scaffolded — source files not yet committed
-- Stack: Node
-- Needs: K8s API polling + NATS aggregation + WebSocket output to React dashboard (fully wired in Phase 5)
+### metrics-service ✅
+- Source files committed: `src/index.js`
+- `package.json` present
+- Dockerfile: non-root `appuser`, healthcheck, `EXPOSE 3002`
+- Docker image built and verified: `metrics-service:v1` (240MB / 58MB compressed)
+- Implements: WebSocket server (`ws`), NATS wildcard subscriber (`>`), Prometheus default metrics (`prom-client`), in-memory event log (last 100 events), HTTP `/health` + `/metrics` endpoints
+- Commit: `feat: add metrics-service with WebSocket, NATS subscriber, and Prometheus` (`286bd5b`)
+- Tag: `metrics-service-v1`
 
 ---
 
@@ -215,7 +219,7 @@ Mermaid/Excalidraw diagram; three GIFs; full README sections and live demo URL.
 | Phase | Status | Key Deliverable |
 |-------|--------|-----------------|
 | 1 — K8s Local | ✅ | Monorepo scaffold ✅ · toolchain ✅ · Minikube + addons ✅ |
-| 2 — Services | 🔄 | booking-service ✅ · api-gateway 🔄 · auth/notification/metrics ❌ |
+| 2 — Services | 🔄 | booking-service ✅ · api-gateway 🔄 · auth ❌ · notification ❌ · metrics-service ✅ |
 | 3 — K8s Manifests | ❌ | Deployments + Ingress |
 | 4 — NATS | ❌ | Event-driven architecture |
 | 5 — Prometheus | ❌ | Live metrics scraping |
@@ -243,6 +247,13 @@ Mermaid/Excalidraw diagram; three GIFs; full README sections and live demo URL.
 
 ---
 
+## Docker Desktop (notes)
+
+- Minikube container running: `fa53fbc76dfa` · 39.9% CPU · 762.6MB / 3GB RAM
+- Docker Desktop v4.69.0 · RAM 7.21GB · CPU 12.07% · Disk 5.65GB used
+
+---
+
 ## The Three GIFs That Got Me the Interview
 
 1. **Pod self-healing:** Kill a pod → K8s restarts it → UI shows recovery.
@@ -255,6 +266,8 @@ Mermaid/Excalidraw diagram; three GIFs; full README sections and live demo URL.
 
 | Commit | Message |
 |--------|---------|
+| `286bd5b` | feat: add metrics-service with WebSocket, NATS subscriber, and Prometheus |
+| `metrics-service-v1` (tag) | metrics-service initial build v1 |
 | `3b85dfc` | docs(PRD): bump to v2.1 - phase 2 service details and monorepo paths |
 | `97ddc3d` | feat(booking-service): add source files, Dockerfile fix, package-lock |
 | `d5ab3ca` | fix(booking-service): rename node→appuser, add package-lock.json |
