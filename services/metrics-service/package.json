@@ -1,0 +1,13 @@
+{
+  "name": "metrics-service",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "scripts": { "start": "node src/index.js" },
+  "dependencies": {
+    "express": "^4.19.2",
+    "ws": "^8.17.0",
+    "nats": "^2.28.0",
+    "node-fetch": "^3.3.2",
+    "prom-client": "^15.1.3"
+  }
+}
