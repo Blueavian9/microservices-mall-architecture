@@ -255,6 +255,7 @@ Mermaid/Excalidraw diagram; three GIFs; full README sections and live demo URL.
 
 | Commit | Message |
 |--------|---------|
+| `3b85dfc` | docs(PRD): bump to v2.1 - phase 2 service details and monorepo paths |
 | `97ddc3d` | feat(booking-service): add source files, Dockerfile fix, package-lock |
 | `d5ab3ca` | fix(booking-service): rename node→appuser, add package-lock.json |
 
