@@ -169,7 +169,6 @@ Each service is a separate Docker image. Each owns its domain. Each emits events
 - Implements: WebSocket server (`ws`), NATS wildcard subscriber (`'>'`), Prometheus default metrics (`prom-client`), in-memory event log (last 100 events), HTTP `/health` + `/metrics` endpoints
 - Commit: `feat: add metrics-service with WebSocket, NATS subscriber, and Prometheus` (`286bd5b`)
 - Tag: `metrics-service-v1`
-- **Phase 5+:** K8s API polling and full dashboard wiring remain for later phases.
 
 ---
 
