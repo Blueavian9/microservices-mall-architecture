@@ -166,9 +166,10 @@ Each service is a separate Docker image. Each owns its domain. Each emits events
 - `package.json` present
 - Dockerfile: non-root `appuser`, healthcheck, `EXPOSE 3002`
 - Docker image built and verified: `metrics-service:v1` (240MB / 58MB compressed)
-- Implements: WebSocket server (`ws`), NATS wildcard subscriber (`>`), Prometheus default metrics (`prom-client`), in-memory event log (last 100 events), HTTP `/health` + `/metrics` endpoints
+- Implements: WebSocket server (`ws`), NATS wildcard subscriber (`'>'`), Prometheus default metrics (`prom-client`), in-memory event log (last 100 events), HTTP `/health` + `/metrics` endpoints
 - Commit: `feat: add metrics-service with WebSocket, NATS subscriber, and Prometheus` (`286bd5b`)
 - Tag: `metrics-service-v1`
+- **Phase 5+:** K8s API polling and full dashboard wiring remain for later phases.
 
 ---
 
@@ -247,18 +248,18 @@ Mermaid/Excalidraw diagram; three GIFs; full README sections and live demo URL.
 
 ---
 
-## Docker Desktop (notes)
-
-- Minikube container running: `fa53fbc76dfa` · 39.9% CPU · 762.6MB / 3GB RAM
-- Docker Desktop v4.69.0 · RAM 7.21GB · CPU 12.07% · Disk 5.65GB used
-
----
-
 ## The Three GIFs That Got Me the Interview
 
 1. **Pod self-healing:** Kill a pod → K8s restarts it → UI shows recovery.
 2. **Event-driven flow:** Book a session → event cascade through NATS → email arrives.
 3. **HPA scale-up:** Load test → booking-service scales 1 → 5 replicas.
+
+---
+
+## Local environment (Docker Desktop)
+
+- Minikube container running: `fa53fbc76dfa` · 39.9% CPU · 762.6MB / 3GB RAM
+- Docker Desktop v4.69.0 · RAM 7.21GB · CPU 12.07% · Disk 5.65GB used
 
 ---
 
