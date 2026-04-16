@@ -1,7 +1,7 @@
 # Cloud Native Microservices Live Platform — PRD
 
 **Product:** Self-demonstrating microservices platform — the visualizer IS the system  
-**Version:** 2.1  
+**Version:** 2.0  
 **Author:** Cesar A. Aguilar (Blueavian9)  
 **Architect Pattern:** SOLID · Event-Driven · Cloud Native · Chain-of-Thought  
 **Level Target:** Level 3 — Kubernetes Orchestration + Event-Driven Architecture  
@@ -30,7 +30,7 @@
 
 ---
 
-## Delivery Discipline (Commits & PRD)
+## Delivery discipline (commits & PRD)
 
 Work is checkpointed at every meaningful boundary:
 
@@ -41,7 +41,7 @@ Skipping either step should be the exception (e.g., blocked network), not the de
 
 ---
 
-## Agent Tasks (A1–A9)
+## Agent tasks (A1–A9)
 
 | Task | Maps to | Focus |
 |------|---------|--------|
@@ -68,7 +68,7 @@ Execute in order **A1 → A2 → … → A9**. After each task: commit, push, up
 │  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌────────┐ │
 │  │ API GW   │  │  Auth    │  │ Booking  │  │Notify  │ │
 │  │ Service  │  │ Service  │  │ Service  │  │Service │ │
-│  │ (Node)   │  │ (Python) │  │  (Node)  │  │(Python)│ │
+│  │ (Node)   │  │ (Python) │  │  (Go)    │  │(Python)│ │
 │  └────┬─────┘  └────┬─────┘  └────┬─────┘  └───┬────┘ │
 │       │              │              │              │     │
 │  ─────┴──────────────┴──────────────┴──────────────┴─── │
@@ -103,8 +103,8 @@ D — Services depend on NATS abstractions — swap broker without touching busi
 
 | Phase | Focus | Status |
 |-------|-------|--------|
-| PHASE 1 | Local K8s Environment (Minikube) | ✅ COMPLETE |
-| PHASE 2 | Microservices — Build Each Service | 🔄 IN PROGRESS |
+| PHASE 1 | Local K8s Environment (Minikube) | 🔄 IN PROGRESS |
+| PHASE 2 | Microservices — Build Each Service | ❌ NOT STARTED |
 | PHASE 3 | Kubernetes Manifests | ❌ NOT STARTED |
 | PHASE 4 | NATS Event Bus Setup | ❌ NOT STARTED |
 | PHASE 5 | Prometheus + Metrics | ❌ NOT STARTED |
@@ -115,100 +115,89 @@ D — Services depend on NATS abstractions — swap broker without touching busi
 
 ---
 
-## PHASE 1: Local K8s Environment ✅
+## PHASE 1: Local K8s Environment
 
-### Task 1: Install Toolchain ✅
+### Task 1: Install Toolchain
 
-- kubectl, minikube, Helm, k9s installed via Scoop on Windows
-- Docker Desktop installed and running
-- `minikube start --driver=docker --cpus=4 --memory=8192 --disk-size=20g` ✅
-- `minikube addons enable ingress` ✅
-- `minikube addons enable metrics-server` ✅
+**Status:** 🔄 In progress — CLIs installed (Scoop: kubectl, minikube, helm, k9s); **Minikube cluster not running** until Docker Desktop is installed and on `PATH`, then `minikube start --driver=docker ...` + addons.
+
+- Install Minikube, kubectl, Helm, k9s — **done on dev machine via Scoop** (see `scripts/install-toolchain.ps1`). Verify with `scripts/verify-toolchain.ps1`.
+- Start Minikube with `--cpus=4 --memory=8192 --disk-size=20g`; enable **ingress** and **metrics-server** addons — **pending Docker**.
 - Commit: `chore: toolchain setup + Minikube running`
 
-### Task 2: Monorepo Scaffold ✅
+**A1 completion checklist (run on your machine):**
 
-- Full directory tree created with `.gitkeep` files
-- Directories: `services/api-gateway`, `services/auth-service`, `services/booking-service`, `services/notification-service`, `services/metrics-service`, `k8s`, `k8s/base`, `k8s/monitoring`, `frontend`, `scripts`
-- `.gitignore`, `.env.example`, `docker-compose.yml` (postgres:16-alpine + nats:2.10-alpine)
-- `README.md` placeholder committed
+1. **Docker Desktop** — Install for Windows, finish first-run setup, confirm `docker version` works in PowerShell (Docker must be on `PATH`).
+2. **Cluster + addons** — From repo root: `.\scripts\install-toolchain.ps1` (installs CLIs if needed, then starts Minikube and enables addons when `docker` exists). *Or* run only the Minikube lines if CLIs are already installed:
+   - `minikube start --driver=docker --cpus=4 --memory=8192 --disk-size=20g`
+   - `minikube addons enable ingress`
+   - `minikube addons enable metrics-server`
+3. **Verify** — `.\scripts\verify-toolchain.ps1`; `kubectl get nodes`; `minikube status`; `minikube addons list` (ingress and metrics-server enabled).
+4. **Gate** — When the above passes, mark **A1** ✅ and **PHASE 1** complete in this file, commit + push, then begin **A2** (microservices).
+
+Until A1 is finished locally, `git status` may stay clean — there is nothing to commit until you update the PRD after Minikube is up or add automation/docs from that work.
+
+### Task 2: Monorepo Scaffold
+
+**Status:** ✅ Complete
+
+- Create project root (this repo root; PRD names `/microservices-live-platform/` as conceptual).
+- Directories: `services/api-gateway`, `services/auth-service`, `services/booking-service`, `services/notification-service`, `services/metrics-service`, `k8s`, `k8s/base`, `k8s/monitoring`, `frontend`, `scripts` (plus `services/*/src`, `frontend/src/components/{topology,events,metrics}`, `frontend/src/hooks`, `shared/events`).
+- Root `docker-compose.yml` for local dev (before K8s) — Postgres + NATS only.
+- Root `README.md` with architecture diagram placeholder; root `.gitignore`, `.env.example`.
 - Commit: `chore: monorepo scaffold with service directories`
 
 ---
 
-## PHASE 2: Microservices — Build Each Service 🔄
+## PHASE 2: Microservices — Build Each Service
 
 Each service is a separate Docker image. Each owns its domain. Each emits events.
 
-### booking-service ✅
-- Source files committed: `src/index.js`, `src/app.js`, `src/db.js`, `src/nats.js`, `src/routes/bookings.js`
-- `package.json` + `package-lock.json` present
-- Dockerfile fixed: renamed `node` user → `appuser` (conflict with base image resolved)
-- Docker image built and verified: `booking-service:v1` (214MB)
-- Commit: `feat(booking-service): add source files, Dockerfile fix, package-lock` (`97ddc3d`)
-
-### api-gateway 🔄
-- Source files present: `src/app.js`, `src/env.validate.js`, `src/index.js`, `src/routes/`, `src/middleware/`, `src/metrics/`
-- **Next step:** Run `docker build -t api-gateway:v1 .` to verify image builds cleanly
-
-### auth-service ❌
-- Directory scaffolded — source files not yet committed
-- Stack: Python / FastAPI
-- Needs: `GET /health`, `POST /register`, `POST /login` (JWT), NATS publish `auth.user_registered`, Prometheus metrics via `prometheus-fastapi-instrumentator`
-
-### notification-service ❌
-- Directory scaffolded — source files not yet committed
-- Stack: Python / FastAPI
-- Needs: NATS subscriber for `booking.created` + `auth.user_registered`; `GET /health` only
-
-### metrics-service ✅
-- Source files committed: `src/index.js`
-- `package.json` present
-- Dockerfile: non-root `appuser`, healthcheck, `EXPOSE 3002`
-- Docker image built and verified: `metrics-service:v1` (240MB / 58MB compressed)
-- Implements: WebSocket server (`ws`), NATS wildcard subscriber (`'>'`), Prometheus default metrics (`prom-client`), in-memory event log (last 100 events), HTTP `/health` + `/metrics` endpoints
-- Commit: `feat: add metrics-service with WebSocket, NATS subscriber, and Prometheus` (`286bd5b`)
-- Tag: `metrics-service-v1`
+- **API Gateway (Node/Express):** health, proxy routes, NATS `request.received`.
+- **Auth (Python/FastAPI):** register, login, JWT, NATS `user.registered`.
+- **Booking (Node/Express per PRD stretch):** create/list bookings, Postgres, NATS `booking.created`.
+- **Notification (Python/FastAPI):** NATS subscriber for `booking.created`, `user.registered`; health only otherwise.
+- **Metrics (Node):** K8s API + NATS + WebSocket to UI.
 
 ---
 
-## PHASE 3: Kubernetes Manifests ❌
+## PHASE 3: Kubernetes Manifests
 
 Namespace, ConfigMaps, secrets template; Deployments and Services for all five services; Ingress for `/api/*` and `/ws`.
 
 ---
 
-## PHASE 4: NATS Event Bus Setup ❌
+## PHASE 4: NATS Event Bus Setup
 
 Helm deploy NATS; shared event schema in `shared/events`; subjects contract; event chain testing.
 
 ---
 
-## PHASE 5: Prometheus + Metrics ❌
+## PHASE 5: Prometheus + Metrics
 
 kube-prometheus-stack; `/metrics` on services; metrics-service aggregates Prometheus + K8s + NATS → WebSocket.
 
 ---
 
-## PHASE 6: React Live Dashboard ❌
+## PHASE 6: React Live Dashboard
 
 Topology (React Flow), PodCard, EventStream, TrafficGraph, `useLivePlatform` hook.
 
 ---
 
-## PHASE 7: Horizontal Pod Autoscaling Demo ❌
+## PHASE 7: Horizontal Pod Autoscaling Demo
 
 HPA for booking-service; k6 load test; GIF for README.
 
 ---
 
-## PHASE 8: Cloud Deploy (AWS EKS) ❌
+## PHASE 8: Cloud Deploy (AWS EKS)
 
 eksctl cluster; ECR push; manifests; frontend on Vercel/S3.
 
 ---
 
-## PHASE 9: README + Demo ❌
+## PHASE 9: README + Demo
 
 Mermaid/Excalidraw diagram; three GIFs; full README sections and live demo URL.
 
@@ -218,8 +207,8 @@ Mermaid/Excalidraw diagram; three GIFs; full README sections and live demo URL.
 
 | Phase | Status | Key Deliverable |
 |-------|--------|-----------------|
-| 1 — K8s Local | ✅ | Monorepo scaffold ✅ · toolchain ✅ · Minikube + addons ✅ |
-| 2 — Services | 🔄 | booking-service ✅ · api-gateway 🔄 · auth ❌ · notification ❌ · metrics-service ✅ |
+| 1 — K8s Local | 🔄 | Monorepo scaffold ✅; toolchain CLIs ✅ (Scoop); Minikube cluster + addons ⏳ (needs Docker) |
+| 2 — Services | ❌ | 5 Dockerized microservices |
 | 3 — K8s Manifests | ❌ | Deployments + Ingress |
 | 4 — NATS | ❌ | Event-driven architecture |
 | 5 — Prometheus | ❌ | Live metrics scraping |
@@ -247,7 +236,7 @@ Mermaid/Excalidraw diagram; three GIFs; full README sections and live demo URL.
 
 ---
 
-## The Three GIFs That Got Me the Interview
+## The Three GIFs That Got me the Interview
 
 1. **Pod self-healing:** Kill a pod → K8s restarts it → UI shows recovery.
 2. **Event-driven flow:** Book a session → event cascade through NATS → email arrives.
@@ -255,23 +244,4 @@ Mermaid/Excalidraw diagram; three GIFs; full README sections and live demo URL.
 
 ---
 
-## Local environment (Docker Desktop)
-
-- Minikube container running: `fa53fbc76dfa` · 39.9% CPU · 762.6MB / 3GB RAM
-- Docker Desktop v4.69.0 · RAM 7.21GB · CPU 12.07% · Disk 5.65GB used
-
----
-
-## Recent Commits
-
-| Commit | Message |
-|--------|---------|
-| `286bd5b` | feat: add metrics-service with WebSocket, NATS subscriber, and Prometheus |
-| `metrics-service-v1` (tag) | metrics-service-v1 — metrics-service initial build v1 |
-| `3b85dfc` | docs(PRD): bump to v2.1 - phase 2 service details and monorepo paths |
-| `97ddc3d` | feat(booking-service): add source files, Dockerfile fix, package-lock |
-| `d5ab3ca` | fix(booking-service): rename node→appuser, add package-lock.json |
-
----
-
-*This PRD is the single source of truth for scope and phase deliverables.*
+*This PRD is the single source of truth for scope and phase deliverables. Detailed step-by-step checklists for Phases 2–9 follow the same structure as the original v2.0 specification (service files, Helm commands, exact YAML snippets, and README section list).*
