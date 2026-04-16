@@ -267,7 +267,7 @@ Mermaid/Excalidraw diagram; three GIFs; full README sections and live demo URL.
 | Commit | Message |
 |--------|---------|
 | `286bd5b` | feat: add metrics-service with WebSocket, NATS subscriber, and Prometheus |
-| `metrics-service-v1` (tag) | metrics-service initial build v1 |
+| `metrics-service-v1` (tag) | metrics-service-v1 — metrics-service initial build v1 |
 | `3b85dfc` | docs(PRD): bump to v2.1 - phase 2 service details and monorepo paths |
 | `97ddc3d` | feat(booking-service): add source files, Dockerfile fix, package-lock |
 | `d5ab3ca` | fix(booking-service): rename node→appuser, add package-lock.json |
