@@ -1,73 +1,50 @@
-const express = require('express');
+const express    = require('express');
 const { WebSocketServer } = require('ws');
-const http = require('http');
-const { connect, StringCodec } = require('nats');
-const client = require('prom-client');
+const fetch      = require('node-fetch');
+const { getPods }        = require('./k8s');
+const { subscribeAll, getEvents } = require('./nats');
 
-const PORT = process.env.PORT || 3002;
-const NATS_URL = process.env.NATS_URL || 'nats://nats:4222';
+const PORT      = process.env.PORT || 4000;
+const PROM_URL  = process.env.PROMETHEUS_URL || 'http://prometheus:9090';
 
 const app = express();
-const server = http.createServer(app);
+app.get('/health', (_req, res) => res.json({ status: 'ok', service: 'metrics-service' }));
+const server = app.listen(PORT, () => console.log(`[metrics] HTTP on :${PORT}`));
+
 const wss = new WebSocketServer({ server });
-
-// Prometheus default metrics
-client.collectDefaultMetrics();
-
-// In-memory event log (last 100)
-const eventLog = [];
-const MAX_EVENTS = 100;
+wss.on('connection', ws => {
+  console.log('[ws] client connected');
+  ws.on('close', () => console.log('[ws] client disconnected'));
+});
 
 function broadcast(data) {
-  const msg = JSON.stringify(data);
-  wss.clients.forEach(ws => {
-    if (ws.readyState === ws.OPEN) ws.send(msg);
+  const payload = JSON.stringify(data);
+  wss.clients.forEach(client => {
+    if (client.readyState === 1) client.send(payload);
   });
 }
 
-// NATS subscriber — forward all events to WebSocket clients
-async function startNatsSubscriber() {
+async function fetchTraffic() {
   try {
-    const nc = await connect({ servers: NATS_URL });
-    const sc = StringCodec();
-    console.log(`[metrics-service] NATS connected: ${NATS_URL}`);
-
-    const sub = nc.subscribe('>'); // wildcard — all subjects
-    (async () => {
-      for await (const msg of sub) {
-        const event = {
-          type: 'event',
-          subject: msg.subject,
-          data: sc.decode(msg.data),
-          ts: new Date().toISOString(),
-        };
-        eventLog.push(event);
-        if (eventLog.length > MAX_EVENTS) eventLog.shift();
-        broadcast(event);
-      }
-    })();
+    const url = `${PROM_URL}/api/v1/query?query=http_requests_total`;
+    const res  = await fetch(url, { timeout: 3000 });
+    const json = await res.json();
+    const traffic = {};
+    (json?.data?.result || []).forEach(r => {
+      const svc = r.metric?.service || r.metric?.job || 'unknown';
+      traffic[svc] = parseFloat(r.value?.[1] || 0);
+    });
+    return traffic;
   } catch (err) {
-    console.warn(`[metrics-service] NATS unavailable (will retry on next restart): ${err.message}`);
+    console.error('[prometheus] fetch error:', err.message);
+    return {};
   }
 }
 
-// WebSocket: send last 100 events on connect
-wss.on('connection', (ws) => {
-  console.log('[metrics-service] WebSocket client connected');
-  ws.send(JSON.stringify({ type: 'history', events: eventLog }));
-});
+async function tick() {
+  const [pods, traffic] = await Promise.all([getPods(), fetchTraffic()]);
+  broadcast({ pods, events: getEvents(), traffic, timestamp: new Date().toISOString() });
+}
 
-// HTTP routes
-app.get('/health', (req, res) => res.json({ status: 'ok', service: 'metrics-service' }));
-
-app.get('/metrics', async (req, res) => {
-  res.set('Content-Type', client.register.contentType);
-  res.end(await client.register.metrics());
-});
-
-app.get('/events', (req, res) => res.json({ events: eventLog }));
-
-server.listen(PORT, () => {
-  console.log(`[metrics-service] HTTP+WS listening on :${PORT}`);
-  startNatsSubscriber();
-});
+subscribeAll();
+setInterval(tick, 2000);

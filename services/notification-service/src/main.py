@@ -1,29 +1,19 @@
-import asyncio, json
-import nats
+import os, asyncio, json, logging
 from fastapi import FastAPI
-from prometheus_fastapi_instrumentator import Instrumentator
-from .config import settings
+from contextlib import asynccontextmanager
+from src.events import connect_nats, subscribe_all
 
-app = FastAPI(title="notification-service")
-Instrumentator().instrument(app).expose(app)
+logging.basicConfig(level=logging.INFO)
+log = logging.getLogger("notification-service")
 
-SUBJECTS = ["booking.created", "auth.user_registered"]
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    task = asyncio.create_task(connect_nats())
+    yield
+    task.cancel()
 
-@app.get("/health")
+app = FastAPI(title="notification-service", lifespan=lifespan)
+
+@app.get("/notification/health")
 def health():
     return {"status": "ok", "service": "notification-service"}
-
-async def handle(msg):
-    data = json.loads(msg.data.decode())
-    print(f"[NOTIFY] subject={msg.subject} data={data}", flush=True)
-    # TODO Phase 8+: plug in real email/SMS provider here
-
-async def start_subscriber():
-    nc = await nats.connect(settings.nats_url)
-    for subject in SUBJECTS:
-        await nc.subscribe(subject, cb=handle)
-    print(f"[NOTIFY] subscribed to {SUBJECTS}", flush=True)
-
-@app.on_event("startup")
-async def startup():
-    asyncio.create_task(start_subscriber())
